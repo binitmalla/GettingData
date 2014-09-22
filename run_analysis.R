@@ -1,4 +1,4 @@
-
+setwd("./coursera/Getting and Cleaning Data/Course Project")
 library(data.table)
 
 #Load Activity labels
@@ -14,7 +14,7 @@ subject_test <- read.table("./test/subject_test.txt", col.names="subject")
 x_test <- read.table("./test/X_test.txt")
 
 #Add column names
-names(x_test)=features
+names(x_test)=features[,2]
 
 #Add a second column with description
 y_test[,2]=activity_labels[y_test[,1]]
@@ -30,7 +30,7 @@ subject_train <- read.table("./train/subject_train.txt", col.names="subject")
 x_train <- read.table("./train/X_train.txt")
 
 #Add column names
-names(x_train)=features
+names(x_train)=features[,2]
 
 #Add a second column with description
 y_train[,2]=activity_labels[y_train[,1]]
@@ -55,11 +55,12 @@ selectcolumns <- features[grep("mean\\(\\)|std\\(\\)", features$V2), ]
 clean_colnames <- tolower(gsub("[^[:alpha:]]", "", colnames(merged_data)))
 head(clean_colnames)
 colnames(merged_data)<-clean_colnames
-
+head(merged_data)
 
 #Step5
-tidy_data<-merged_data[,c(1:3,selectcolumns$V1)]
-tidy_data<-aggregate(tidy_data,by=list(tidy_data$subject,label=tidy_data$label),mean)
+tidy_data<-merged_data[,c(1:3,3+selectcolumns$V1)]
+tidy_data<-aggregate(tidy_data,by=list(tidy_data$subject,label=tidy_data$activity),mean)
+tidy_data<-tidy_data[,c(1:2,6:ncol(tidy_data))]
 
 
 write.table(format(tidy_data, scientific=T), "tidy.txt",row.names=F, col.names=F, quote=2)
